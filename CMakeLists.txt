@@ -27,3 +27,12 @@ add_executable(transpose_benchmark
 target_include_directories(transpose_benchmark PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+add_executable(convolution_benchmark
+    src/convolution/convolution.cu
+    src/common/cuda_utils.cu
+)
+
+target_include_directories(convolution_benchmark PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
