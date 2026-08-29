@@ -1,0 +1,7 @@
+workload,representative_size,run,baseline_label,baseline_ms,optimized_label,optimized_ms
+Reduction,"4,000,000 elements",1,Global atomic,2.418920,Shared block,0.169618
+Reduction,"4,000,000 elements",2,Global atomic,2.380179,Shared block,0.168890
+Transpose,4096x4096,1,Naive,0.763699,Padded tiled,0.600842
+Transpose,4096x4096,2,Naive,0.769010,Padded tiled,0.599752
+Convolution,2048x2048,1,Naive,0.143806,Shared tiled,0.190342
+Convolution,2048x2048,2,Naive,0.144216,Shared tiled,0.192830

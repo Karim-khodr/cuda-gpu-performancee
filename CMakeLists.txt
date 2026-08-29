@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.28)
 
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES 75 CACHE STRING "CUDA architectures to build")
+endif()
+
 project(cuda_gpu_performance LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 17)

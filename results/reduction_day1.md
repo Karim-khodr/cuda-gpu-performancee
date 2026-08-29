@@ -153,3 +153,12 @@ measurements alone do not prove that atomic contention was the bottleneck.
 - Nsight profiling is still required before making strong bottleneck,
   occupancy, memory-bandwidth, cache, or warp-efficiency conclusions.
 - Warp-shuffle reduction was intentionally outside the Day 1 MVP.
+
+## Day 4 follow-up
+
+The limitation above records what remained unknown at the end of Day 1.
+[Nsight Compute profiling on Day 4](profiling_day4.md) subsequently showed that
+input-load work remained effectively unchanged while relevant global-reduction
+activity fell by approximately 256× in the shared-memory design. The profiler
+evidence supports substantially lower global-reduction pressure without
+assigning the original timing difference to one sole bottleneck.

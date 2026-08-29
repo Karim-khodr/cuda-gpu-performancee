@@ -350,6 +350,17 @@ to manufacture a positive speedup.
 - Small-kernel measurements are noisy.
 - Benchmark dimensions are representative rather than exhaustive.
 
+## Day 4 follow-up
+
+The statements above preserve the evidence available at the end of Day 3.
+[Nsight Compute profiling on Day 4](profiling_day4.md) later showed substantially
+lower L1 global-load activity in the tiled kernel but essentially unchanged
+downstream misses and no reduction in DRAM-read traffic. Tiling also introduced
+shared-memory traffic and bank conflicts, higher register use, lower theoretical
+occupancy, synchronization pressure, and poorer ready-warp availability. These
+combined observations support the cache-reuse and added-overhead explanation
+without isolating one sole cause for the slowdown.
+
 ## Conclusion
 
 Day 3 established a deterministic CPU oracle, a correct naive CUDA baseline,

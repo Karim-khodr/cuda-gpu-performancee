@@ -272,6 +272,23 @@ establish the hardware cause.
 - Only `float` matrices were tested.
 - The benchmark size set is representative, not exhaustive.
 
+## Day 4 and Day 5 follow-up
+
+The profiler limitations above describe the state at the end of Day 2.
+[Nsight Compute profiling on Day 4](profiling_day4.md) later showed that global
+store sectors/request fell from 16 in the naive kernel to 4 in both tiled
+variants. For padding, total reported shared-memory conflicts fell by
+approximately 71% and shared-memory wavefronts by approximately 41%, primarily
+through improved transposed-load behavior, although shared-store conflicts
+increased.
+
+The 2.7–3.4% padding runtime advantage at `4096×4096` remains specific to the
+two authoritative Day 2 runs. A single fresh-build Day 5 sanity run reversed
+the padded/unpadded ordering while preserving the substantially stronger
+padded-versus-naive improvement. The profiling evidence therefore supports
+improved aggregate shared-memory behavior, not a claim that padding is
+universally faster.
+
 ## Day 2 conclusion
 
 Day 2 established a tested progression from a CPU oracle through naive and

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="title description">
+  <title id="title">Relative kernel time across three CUDA experiments</title>
+  <desc id="description">Optimized mean kernel time divided by baseline mean kernel time for two authoritative runs of reduction, transpose, and convolution. Lower values are better; convolution is above baseline.</desc>
+  <style>
+    :root { --bg: #ffffff; --fg: #172033; --muted: #5b6475; --grid: #d8dde7; --improvement: #16775b; --regression: #b85c16; --baseline: #526176; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #111827; --fg: #f3f4f6; --muted: #c2c9d6; --grid: #3b4558; --improvement: #55d6a8; --regression: #ffad66; --baseline: #aeb8c8; } }
+    text { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: var(--fg); }
+    .title { font-size: 24px; font-weight: 600; }
+    .subtitle, .axis, .note { fill: var(--muted); font-size: 13px; }
+    .workload { font-size: 17px; font-weight: 600; }
+    .detail, .value { font-size: 13px; }
+    .value { font-weight: 600; }
+    .grid { stroke: var(--grid); stroke-width: 1; }
+    .baseline { stroke: var(--baseline); stroke-width: 2; stroke-dasharray: 5 5; }
+    .range-improvement { stroke: var(--improvement); fill: var(--improvement); }
+    .range-regression { stroke: var(--regression); fill: var(--regression); }
+  </style>
+  <rect width="960" height="560" fill="var(--bg)"/>
+  <text x="30" y="42" class="title">Relative kernel time across three CUDA experiments</text>
+  <text x="30" y="68" class="subtitle">Each baseline = 1.0 · lower is better · points are the two authoritative runs</text>
+  <line x1="300.00" y1="160" x2="300.00" y2="450" class="grid"/>
+  <text x="300.00" y="475" text-anchor="middle" class="axis">0.000</text>
+  <line x1="400.00" y1="160" x2="400.00" y2="450" class="grid"/>
+  <text x="400.00" y="475" text-anchor="middle" class="axis">0.250</text>
+  <line x1="500.00" y1="160" x2="500.00" y2="450" class="grid"/>
+  <text x="500.00" y="475" text-anchor="middle" class="axis">0.500</text>
+  <line x1="600.00" y1="160" x2="600.00" y2="450" class="grid"/>
+  <text x="600.00" y="475" text-anchor="middle" class="axis">0.750</text>
+  <line x1="700.00" y1="160" x2="700.00" y2="450" class="baseline"/>
+  <text x="700.00" y="475" text-anchor="middle" class="axis">1.000</text>
+  <line x1="800.00" y1="160" x2="800.00" y2="450" class="grid"/>
+  <text x="800.00" y="475" text-anchor="middle" class="axis">1.250</text>
+  <line x1="900.00" y1="160" x2="900.00" y2="450" class="grid"/>
+  <text x="900.00" y="475" text-anchor="middle" class="axis">1.500</text>
+  <text x="700.00" y="148" text-anchor="middle" class="axis">baseline 1.0</text>
+  <text x="30" y="207" class="workload">Reduction</text>
+  <text x="30" y="229" class="detail">4,000,000 elements · Shared block / Global atomic</text>
+  <line x1="328.05" y1="215" x2="328.38" y2="215" class="range-improvement" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="328.05" cy="208" r="7" class="range-improvement"/>
+  <rect x="322.38" y="216" width="12" height="12" class="range-improvement" transform="rotate(45 328.38 222)"/>
+  <text x="342.38" y="204" class="value">0.070–0.071×</text>
+  <text x="342.38" y="225" class="detail">lower relative time</text>
+  <text x="30" y="307" class="workload">Transpose</text>
+  <text x="30" y="329" class="detail">4096x4096 · Padded tiled / Naive</text>
+  <line x1="611.96" y1="315" x2="614.70" y2="315" class="range-improvement" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="614.70" cy="308" r="7" class="range-improvement"/>
+  <rect x="605.96" y="316" width="12" height="12" class="range-improvement" transform="rotate(45 611.96 322)"/>
+  <text x="628.70" y="304" class="value">0.780–0.787×</text>
+  <text x="628.70" y="325" class="detail">lower relative time</text>
+  <text x="30" y="407" class="workload">Convolution</text>
+  <text x="30" y="429" class="detail">2048x2048 · Shared tiled / Naive</text>
+  <line x1="829.44" y1="415" x2="834.84" y2="415" class="range-regression" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="829.44" cy="408" r="7" class="range-regression"/>
+  <rect x="828.84" y="416" width="12" height="12" class="range-regression" transform="rotate(45 834.84 422)"/>
+  <text x="848.84" y="404" class="value">1.324–1.337×</text>
+  <text x="848.84" y="425" class="detail">higher relative time</text>
+  <text x="600.00" y="505" text-anchor="middle" class="axis">optimized mean kernel time / baseline mean kernel time</text>
+  <circle cx="327" cy="522" r="6" fill="var(--baseline)"/>
+  <text x="340" y="527" class="note">Run 1</text>
+  <rect x="404" y="516" width="11" height="11" fill="var(--baseline)" transform="rotate(45 409.5 521.5)"/>
+  <text x="424" y="527" class="note">Run 2</text>
+  <text x="510" y="527" class="note">Normalized independently; not an absolute runtime comparison.</text>
+</svg>
