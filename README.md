@@ -41,8 +41,7 @@ The recorded project results used CUDA architecture 75, which is the default in 
 
 ## Detailed Results
 
-- [Reduction](results/reduction_day1.md)
-- [Matrix transpose](results/transpose_day2.md)
-- [2D convolution](results/convolution_day3.md)
-- [Nsight Compute profiling](results/profiling_day4.md)
-- [Selected profiler metrics](results/profiling_day4.csv)
+- [Reduction](results/reduction.md)
+- [Matrix transpose](results/transpose.md)
+- [2D convolution](results/convolution.md)
+- [Nsight Compute profiling](results/profiling.md)

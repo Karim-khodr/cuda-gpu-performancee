@@ -1,164 +1,36 @@
-# Day 1 Reduction Results
+# Reduction
 
-## Hardware / environment
+## Implementation
 
-The Day 1 executable reported and verified the following environment:
-
-- NVIDIA GeForce RTX 4060 Laptop GPU
-- Compute capability 8.9
-- Approximately 8187.5 MiB global memory reported by CUDA
-- 24 multiprocessors reported by CUDA
-- Maximum 1024 threads per block
-- WSL2 / Linux development environment
-- CUDA Toolkit 13.3
-- CMake 3.28.3
-
-These development measurements did not rigorously record or control every
-laptop variable, including AC-power state, thermal state, dynamic clocks,
-background GPU activity, and performance-mode settings. Final project
-benchmarking should standardize and record these conditions.
+The CPU reference accumulates `uint32_t` inputs into a `uint64_t` result. The baseline CUDA kernel uses one global 64-bit atomic contribution per input element. The shared-memory version reduces 256 values within each block and makes one global atomic contribution per block.
 
 ## Correctness
 
-The complete Day 1 regression reported:
+| Implementation | Checks |
+| --- | ---: |
+| CPU reference | 17/17 |
+| Global-atomic CUDA | 17/17 |
+| Shared-memory CUDA | 17/17 |
+| **Total** | **51/51** |
 
-```text
-CPU reduction tests: PASS (17 cases)
-Baseline CUDA reduction tests: PASS (17 cases)
-Shared-memory CUDA reduction tests: PASS (17 cases)
-```
+The deterministic tests include empty and small inputs, values near block boundaries, awkward sizes, randomized inputs, and 64-bit accumulation.
 
-Coverage includes:
+## Results
 
-- Empty input
-- A single element
-- Small arrays with known sums
-- Inputs containing zeros
-- 64-bit accumulation using two `UINT32_MAX` inputs
-- Deterministic randomized inputs
-- Sizes 31, 32, and 33
-- Sizes 255, 256, and 257
-- Sizes 1000, 1003, and 100000
+Both kernels used 256 threads per block and the same deterministic input at each size. Each comparison used 5 warmup launches and 20 measured launches, with alternating kernel order. CUDA events measured kernel execution only; allocation, transfers, accumulator resets, CPU work, and validation were outside the timed region.
 
-The fixed random-number-generator seed is `0x00C0FFEE`, and randomized
-values are in the range 0 through 1000. This coverage is deterministic and
-useful for regression testing, but it is not exhaustive verification.
+The two recorded runs are shown separately. Times are mean kernel times in milliseconds.
 
-## Implementations
+| Elements | Run 1 atomic | Run 1 shared | Run 1 speedup | Run 2 atomic | Run 2 shared | Run 2 speedup |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1,024 | 0.007424 | 0.007475 | 0.993x | 0.007168 | 0.007373 | 0.972x |
+| 10,000 | 0.015763 | 0.009523 | 1.655x | 0.014171 | 0.014634 | 0.968x |
+| 100,000 | 0.064803 | 0.013598 | 4.766x | 0.065013 | 0.011816 | 5.502x |
+| 1,000,000 | 0.589598 | 0.048230 | 12.225x | 0.603853 | 0.048477 | 12.457x |
+| 4,000,000 | 2.418920 | 0.169618 | 14.261x | 2.380179 | 0.168890 | 14.093x |
 
-### CPU reference
+## Notes
 
-The CPU reference is single-threaded. It consumes `uint32_t` elements and
-accumulates into a `uint64_t` result.
+The small workloads were noisy and did not show a consistent advantage. At 4,000,000 elements, the shared-memory kernel was approximately 14.1–14.3x faster across the two runs.
 
-### Baseline CUDA
-
-- 256 threads per block
-- One CUDA thread per input element
-- One global unsigned 64-bit atomic contribution per valid input element
-
-### Shared-memory CUDA
-
-- 256 threads per block
-- One unsigned 64-bit shared value per thread
-- 2048 bytes of shared memory per block
-- Tree-reduction strides: `128 → 64 → 32 → 16 → 8 → 4 → 2 → 1`
-- Block synchronization between reduction stages
-- One global unsigned 64-bit atomic contribution per launched block
-
-The fixed 256-thread configuration is the current Day 1 design, not a claim of
-universal optimality.
-
-## Benchmark methodology
-
-The final comparison uses:
-
-- Kernel-only timing with CUDA events
-- One deterministic input vector shared by both implementations at each size
-- 256 threads per block for both kernels
-- 5 warmup launches per implementation and size
-- 20 measured launches per implementation and size
-- Alternating measured order: baseline/shared, then shared/baseline
-- Accumulator reset with `cudaMemset` before every launch and outside timing
-- Device allocation outside timing
-- Host-to-device and device-to-host transfers outside timing
-- CPU reference calculation outside timing
-- Exact validation of both CUDA results against the CPU reference
-- Arithmetic mean of 20 measurements
-- Minimum observed timing among the same 20 measurements
-- Mean-time speedup calculated as baseline mean divided by shared mean
-
-These measurements compare kernel execution only. They do not represent
-end-to-end application time including allocation, transfers, input generation,
-CPU reference work, validation, or reporting.
-
-## Actual Day 1 comparison
-
-Both authoritative final runs are retained independently. They are not averaged
-together, and no result is selectively discarded.
-
-### Run 1
-
-| Elements | Baseline mean (ms) | Shared mean (ms) | Speedup | Baseline min (ms) | Shared min (ms) |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 1024 | 0.007424 | 0.007475 | 0.993151 | 0.006144 | 0.006144 |
-| 10000 | 0.015763 | 0.009523 | 1.655242 | 0.009216 | 0.004096 |
-| 100000 | 0.064803 | 0.013598 | 4.765502 | 0.061440 | 0.008192 |
-| 1000000 | 0.589598 | 0.048230 | 12.224622 | 0.585728 | 0.045056 |
-| 4000000 | 2.418920 | 0.169618 | 14.261020 | 2.331648 | 0.166912 |
-
-### Run 2
-
-| Elements | Baseline mean (ms) | Shared mean (ms) | Speedup | Baseline min (ms) | Shared min (ms) |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 1024 | 0.007168 | 0.007373 | 0.972222 | 0.004096 | 0.006144 |
-| 10000 | 0.014171 | 0.014634 | 0.968401 | 0.010048 | 0.005088 |
-| 100000 | 0.065013 | 0.011816 | 5.502099 | 0.061440 | 0.008192 |
-| 1000000 | 0.603853 | 0.048477 | 12.456532 | 0.585728 | 0.045056 |
-| 4000000 | 2.380179 | 0.168890 | 14.093107 | 2.331648 | 0.166912 |
-
-## Observations
-
-- The 1,024-element workload showed no shared-memory speed advantage in either
-  run.
-- The 10,000-element result varied substantially between the two runs, so no
-  strong conclusion should be made for that size.
-- The shared-memory implementation was consistently faster in both runs at
-  100,000, 1,000,000, and 4,000,000 elements.
-- At 4,000,000 elements, the measured mean kernel-time speedup was approximately
-  14.1–14.3x across the two runs.
-- Larger workloads produced substantially more repeatable speedup results than
-  the smallest workloads.
-
-The architectural difference is:
-
-```text
-baseline:
-approximately one global atomic contribution per valid element
-
-shared:
-approximately one global atomic contribution per launched block
-```
-
-Reducing global atomic traffic was the intended optimization. These
-measurements alone do not prove that atomic contention was the bottleneck.
-
-## Limitations / next analysis
-
-- Laptop GPU power and thermal dynamics were not rigorously controlled.
-- Microsecond-scale kernels show noticeable timing variability.
-- The fixed 256-thread block size has not been tuned.
-- Only kernel execution is compared; end-to-end transfer and setup costs are
-  excluded.
-- Nsight profiling is still required before making strong bottleneck,
-  occupancy, memory-bandwidth, cache, or warp-efficiency conclusions.
-- Warp-shuffle reduction was intentionally outside the Day 1 MVP.
-
-## Day 4 follow-up
-
-The limitation above records what remained unknown at the end of Day 1.
-[Nsight Compute profiling on Day 4](profiling_day4.md) subsequently showed that
-input-load work remained effectively unchanged while relevant global-reduction
-activity fell by approximately 256× in the shared-memory design. The profiler
-evidence supports substantially lower global-reduction pressure without
-assigning the original timing difference to one sole bottleneck.
+The optimization replaces roughly one global atomic contribution per element with one per block. [Nsight Compute profiling](profiling.md) found unchanged input-load work and about 256x less relevant global-reduction activity. This supports lower global-reduction pressure, but it does not prove a single bottleneck caused the entire speedup.
